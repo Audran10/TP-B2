@@ -107,4 +107,5 @@ Q2 :
 <br><br>
 
 ## IV. Avant-goût TCP et UDP
-
+  - Ip de youtube : 173.194.183.234
+  - Port : 443 (port https)
