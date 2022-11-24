@@ -42,6 +42,43 @@ http://10.102.1.12:19999/#after=-540;before=0;;theme=slate;utc=Europe%2FParis
 
 ➜ **Configurer Netdata pour qu'il vous envoie des alertes** dans [un salon Discord](https://learn.netdata.cloud/docs/agent/health/notifications/discord) dédié en cas de soucis
 
+```
+[audran@web ~]$ sudo nano /etc/netdata/health_alarm_notify.conf
+###############################################################################
+# sending discord notifications
+
+# note: multiple recipients can be given like this:
+#                  "CHANNEL1 CHANNEL2 ..."
+
+# enable/disable sending discord notifications
+SEND_DISCORD="YES"
+
+# Create a webhook by following the official documentation -
+# https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks
+DISCORD_WEBHOOK_URL="https://discordapp.com/api/webhooks/1044058582234181714/sGCbBWmAugHk3d98p9OM_xlwktNtLfTX3Lf_O-1Zmm>
+
+# if a role's recipients are not configured, a notification will be send to
+# this discord channel (empty = do not send a notification for unconfigured
+# roles):
+DEFAULT_RECIPIENT_DISCORD="général"
+```
+
+```
+[audran@web ~]$ sudo nano /etc/netdata/health.d/cpu_usage.conf
+alarm: cpu_usage
+on: system.cpu
+lookup: average -3s percentage foreach user, system
+units: %
+every: 10s
+warn: $this > 50
+crit: $this > 80
+info: CPU utilization of users on the system itself.
+```
+
+```
+[audran@web ~]$ sudo systemctl restart netdata
+```
+
 ➜ **Vérifier que les alertes fonctionnent** en surchargeant volontairement la machine par exemple (effectuez des *stress tests* de RAM et CPU, ou remplissez le disque volontairement par exemple)
 
 ![Monitoring](../pics/monit.jpg)
