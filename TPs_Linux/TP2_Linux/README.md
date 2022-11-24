@@ -408,22 +408,14 @@ LISTEN     0          80                         *:3306                    *:*  
   - exécutez les commandes SQL suivantes :
 
 ```sql
-# Création d'un utilisateur dans la base, avec un mot de passe
-# L'adresse IP correspond à l'adresse IP depuis laquelle viendra les connexions. Cela permet de restreindre les IPs autorisées à se connecter.
-# Dans notre cas, c'est l'IP de web.tp2.linux
-# "pewpewpew" c'est le mot de passe hehe
+
 CREATE USER 'nextcloud'@'10.102.1.11' IDENTIFIED BY 'azerty';
 
-# Création de la base de donnée qui sera utilisée par NextCloud
 CREATE DATABASE IF NOT EXISTS nextcloud CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
-# On donne tous les droits à l'utilisateur nextcloud sur toutes les tables de la base qu'on vient de créer
 GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud'@'10.102.1.11';
 
-# Actualisation des privilèges
 FLUSH PRIVILEGES;
-
-# C'est assez générique comme opération, on crée une base, on crée un user, on donne les droits au user sur la base
 ```
 
 > Par défaut, vous avez le droit de vous connecter localement à la base si vous êtes `root`. C'est pour ça que `sudo mysql -u root` fonctionne, sans nous demander de mot de passe. Evidemment, n'importe quelles autres conditions ne permettent pas une connexion aussi facile à la base.
@@ -520,13 +512,14 @@ Complete!
   ```
 - assurez-vous que le dossier `/var/www/tp2_nextcloud/` et tout son contenu appartient à l'utilisateur qui exécute le service Apache
 ```
-[audran@web tp2_nextcloud]$ ls -al
-drwxr-xr-x. 14 root root 4096 Oct  6 14:47 nextcloud
-
-[audran@web ~]$ ps -ef
-root         693       1  0 01:11 ?        00:00:00 /usr/sbin/httpd -DFOREGROUND
+[audran@web tp2_nextcloud]$ sudo chown -R apache:apache /var/www/tp2_nextcloud/ 
+[audran@web tp2_nextcloud]$ ls -al /var/www/tp2_nextcloud/
+drwxr-xr-x. 15 apache apache  4096 Nov 17 09:23 .
+drwxr-xr-x.  5 root   root      54 Nov 17 01:28 ..
+drwxr-xr-x. 47 apache apache  4096 Oct  6 14:47 3rdparty
+-rw-r--r--.  1 apache apache   156 Oct  6 14:42 index.html
 ```
-C'est bien le même utilisateur.
+Maintenant, c'est bien le même utilisateur.
 
 > A chaque fois que vous faites ce genre de trucs, assurez-vous que c'est bien ok. Par exemple, vérifiez avec un `ls -al` que tout appartient bien à l'utilisateur qui exécute Apache.
 
@@ -570,7 +563,7 @@ C'est bien le même utilisateur.
   #
   #      102.54.94.97     rhino.acme.com          # source server
   #       38.25.63.10     x.acme.com              # x client host
-  #	    10.102.1.11	    web.tp2.linux
+  10.102.1.11	    web.tp2.linux
   ```
 - avec un navigateur, visitez NextCloud à l'URL `http://web.tp2.linux`
   - c'est possible grâce à la modification de votre fichier `hosts`
@@ -586,5 +579,18 @@ C'est bien le même utilisateur.
 🌞 **Exploration de la base de données**
 
 - connectez vous en ligne de commande à la base de données après l'installation terminée
+```
+[audran@web ~]$ mysql -u nextcloud -h 10.102.1.12 -p
+
+MariaDB [(none)]> USE nextcloud;
+MariaDB [nextcloud]> SHOW TABLES;
++-----------------------------+
+| Tables_in_nextcloud         |
++-----------------------------+
+| oc_accounts                 |
+| oc_accounts_data            |
+124 rows in set (0.001 sec)
+```
 - déterminer combien de tables ont été crées par NextCloud lors de la finalisation de l'installation
+
   - ***bonus points*** si la réponse à cette question est automatiquement donnée par une requête SQL
