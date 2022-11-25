@@ -51,23 +51,23 @@ dnf install curl -y
 curl -SLO https://download.nextcloud.com/server/prereleases/nextcloud-25.0.0rc3.zip -k
 dnf install unzip -y
 unzip nextcloud-25.0.0rc3.zip -d /var/www/tp3_nextcloud/
-mv -v /var/www/tp3_nextcloud/nextcloud/* /var/www/tp3_nextcloud
+mv -v /var/www/tp3_nextcloud/nextcloud/.* /var/www/tp3_nextcloud
 rm -r /var/www/tp3_nextcloud/nextcloud
 chown -R apache:apache /var/www/tp3_nextcloud
 
-cat > /etc/httpd/conf/httpd2.conf << EOF
-"<VirtualHost *:80>"
-        "DocumentRoot /var/www/tp3_nextcloud/"
-        "ServerName  auto.tp3.linux"
-        "<Directory /var/www/tp3_nextcloud/>"
-                "Require all granted"
-                "AllowOverride All"
-                "Options FollowSymLinks MultiViews"
-                "<IfModule mod_dav.c>"
-                        "Dav off"
-                "</IfModule>"
-        "</Directory>"
-"</VirtualHost>"
+cat > /etc/httpd/conf.d/httpd2.conf << EOF
+"<VirtualHost *:80>
+        DocumentRoot /var/www/tp3_nextcloud/
+        ServerName  auto.tp3.linux
+        <Directory /var/www/tp3_nextcloud/>
+                Require all granted
+                AllowOverride All
+                Options FollowSymLinks MultiViews
+                <IfModule mod_dav.c>
+                        Dav off
+                </IfModule>
+        </Directory>
+</VirtualHost>"
 EOF
 
 systemctl restart httpd
